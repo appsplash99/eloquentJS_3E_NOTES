@@ -1,0 +1,473 @@
+CHAPTER 3 - FUNCTIONS 
+
+
+DEFINING A FUNCTION-
+A function definition is a regular binding
+where the value of the binding is a function.
+    const square = function(x) {
+      return x * x;
+    };
+
+    console.log(square(12));
+    // → 144
+A function is created with an expression that starts with the keyword function. 
+Functions have a set of parameters (in this case, only x) and a body, 
+which contains the statements that are to be executed when the function is called.
+
+A function can have multiple parameters or no parameters at all.
+
+A return statement determines the value the function returns.
+
+A return keyword without an expression after it 
+will cause the function to return undefined.
+
+Parameters to a function behave like regular bindings, 
+but their initial values are given by the caller of the function, 
+not the code in the function itself.
+
+
+BINDINGS AND SCOPE-
+Each binding has a scope, 
+which is the part of the program in which the binding is visible. 
+
+For bindings defined outside of any function or block, 
+the scope is the whole program—
+you can refer to such bindings wherever you want. 
+These are called global.
+
+But bindings - for function parameters or declared inside a function -
+can be referenced only in that function, 
+so they are known as local bindings. 
+Every time the function is called, 
+new instances of these bindings are created.
+This provides some isolation between functions—
+each function call acts in its own little world (its local environment) 
+and can often be understood without knowing a lot 
+about what’s going on in the global environment.
+
+Bindings declared with let and const are in fact local to the block 
+that they are declared in, so if you create one of those inside of a loop, 
+the code before and after the loop cannot “see” it. 
+In pre-2015 JavaScript, only functions created new scopes, 
+so old-style bindings, created with the var keyword, 
+are visible throughout the whole function that they appear in—
+or throughout the global scope, if they are not in a function.
+    let x = 10;
+    if (true) {
+      let y = 20;
+      var z = 30;
+      console.log(x + y + z);
+      // → 60
+    }
+    // y is not visible here
+    console.log(x + z);
+    // → 40
+Each scope can “look out” into the scope around it, 
+so x is visible inside the block in the example. 
+The exception is when multiple bindings have the same name—
+in that case, code can see only the innermost one. 
+For example, when the code inside the halve function refers to n, 
+it is seeing its own n, not the global n.
+
+
+NESTED SCOPE-
+Blocks and functions can be created inside other blocks and functions, 
+producing multiple degrees of locality.
+
+For example, 
+this function—which outputs the ingredients needed to make a batch of hummus—
+has another function inside it:
+    const hummus = function(factor) {
+      const ingredient = function(amount, unit, name) {
+        let ingredientAmount = amount * factor;
+        if (ingredientAmount > 1) {
+          unit += "s";
+        }
+        console.log(`${ingredientAmount} ${unit} ${name}`);
+      };
+      ingredient(1, "can", "chickpeas");
+      ingredient(0.25, "cup", "tahini");
+      ingredient(0.25, "cup", "lemon juice");
+      ingredient(1, "clove", "garlic");
+      ingredient(2, "tablespoon", "olive oil");
+      ingredient(0.5, "teaspoon", "cumin");
+    };
+The code inside the ingredient function 
+can see the factor binding from the outer function. 
+But its local bindings, such as unit or ingredientAmount, 
+are not visible in the outer function.
+
+The set of bindings visible inside a block 
+is determined by the place of that block in the program text.
+
+Each local scope can also see all the local scopes that contain it, 
+and all scopes can see the global scope. 
+This approach to binding visibility is called lexical scoping.
+
+
+FUNCTIONS AS VALUES-
+A function binding usually simply acts as a name 
+for a specific piece of the program. 
+Such a binding is defined once and never changed. 
+This makes it easy to confuse the function and its name.
+
+further explained in ch5 - Higher Order Functions
+
+
+DECLARATION NOTATION-
+
+There is one subtlety with this form of function definition.
+    console.log("The future says:", future());
+
+    function future() {
+      return "You'll never have flying cars";
+    }
+The preceding code works, 
+even though the function is defined below the code that uses it.
+
+NOTE:
+    Function declarations are not part of the regular top-to-bottom flow of control. 
+    They are conceptually moved to the top of their scope and 
+    can be used by all the code in that scope. 
+
+This is sometimes useful because it offers the freedom 
+to order code in a way that seems meaningful, 
+without worrying about having to define all functions before they are used.
+
+
+ARROW FUNCTIONS-
+    const power = (base, exponent) => {
+      let result = 1;
+      for (let count = 0; count < exponent; count++) {
+        result *= base;
+      }
+      return result;
+    };
+The arrow comes after the list of parameters and 
+is followed by the function’s body. 
+It expresses something like 
+“this input (the parameters) produces this result (the body)”.
+
+When there is only one parameter name, 
+you can omit the parentheses around the parameter list. 
+If the body is a single expression, rather than a block in braces, 
+that expression will be returned from the function. 
+So, these two definitions of square do the same thing:
+    const square1 = (x) => { return x * x; };
+    const square2 = x => x * x;
+
+
+THE CALLSTACK-
+
+Here is a simple program that makes a few function calls:
+    function greet(who) {
+      console.log("Hello " + who);
+    }
+    greet("Harry");
+    console.log("Bye");
+A run through this program goes roughly like this: 
+the call to greet causes control to jump to the start of that function (line 2). 
+The function calls console.log, which takes control, does its job, 
+and then returns control to line 2. 
+There it reaches the end of the greet function, 
+so it returns to the place that called it, which is line 4. 
+The line after that calls console.log again. 
+After that returns, the program reaches its end.
+
+We could show the flow of control schematically like this:
+not in function
+   in greet
+        in console.log
+   in greet
+not in function
+   in console.log
+not in function
+
+The place where the computer stores this context is the call stack.
+Every time a function is called, 
+the current context is stored on top of this stack. 
+When a function returns, it removes the top context from the stack and 
+uses that context to continue execution.
+
+Storing this stack requires space in the computer’s memory. 
+When the stack grows too big, 
+the computer will fail with a message like 
+“out of stack space” or “too much recursion”. 
+
+The following code illustrates this by asking the computer 
+a really hard question that causes 
+an infinite back-and-forth between two functions. 
+Rather, it would be infinite, if the computer had an infinite stack. 
+As it is, we will run out of space, or “blow the stack”.
+    function chicken() {
+      return egg();
+    }
+    function egg() {
+      return chicken();
+    }
+    console.log(chicken() + " came first.");
+    // → ??
+
+
+OPTIONAL ARGUMENTS-
+    function square(x) { return x * x; }
+    console.log(square(4, true, "hedgehog"));
+    // → 16
+We defined square with only one parameter. 
+Yet when we call it with three, the language doesn’t complain. 
+It ignores the extra arguments and computes the square of the first one.
+
+JavaScript is extremely broad-minded 
+about the number of arguments you pass to a function. 
+If you pass too many, the extra ones are ignored. 
+If you pass too few, the missing parameters get assigned the value undefined.
+
+If you write an = operator after a parameter, 
+followed by an expression, 
+the value of that expression will replace the argument when it is not given.
+For example, 
+this version of power makes its second argument optional. 
+If you don’t provide it or pass the value undefined, 
+it will default to two, and the function will behave like square.
+    function power(base, exponent = 2) {
+      let result = 1;
+      for (let count = 0; count < exponent; count++) {
+        result *= base;
+      }
+      return result;
+    }
+
+    console.log(power(4));
+    // → 16
+    console.log(power(2, 6));
+    // → 64
+
+
+CLOSURE-
+The following code shows an example of this. 
+It defines a function, wrapValue, that creates a local binding. 
+It then returns a function that accesses and returns this local binding.
+    function wrapValue(n) {
+      let local = n;
+      return () => local;
+    }
+
+    let wrap1 = wrapValue(1);
+    let wrap2 = wrapValue(2);
+    console.log(wrap1());
+    // → 1
+    console.log(wrap2());
+    // → 2
+This is allowed and works as you’d hope—
+both instances of the binding can still be accessed. 
+This situation is a good demonstration of the fact that 
+local bindings are created anew for every call, 
+and different calls can’t trample on one another’s local bindings.
+
+This feature—
+being able to reference a specific instance 
+of a local binding in an enclosing scope—is called closure.
+A function,
+that references bindings from local scopes around it is called a closure. 
+
+With a slight change, 
+we can turn the previous example into 
+a way to create functions that multiply by an arbitrary amount.
+    function multiplier(factor) {
+      return number => number * factor;
+    }
+
+    console.log(multiplier(2))
+    // → number => number * factor
+    let twice = multiplier(2);
+    console.log(twice(5));
+    // → 10
+The explicit local binding from the wrapValue example isn’t really needed,
+since a parameter is itself a local binding.
+
+ADVICE:
+Thinking about programs like this takes some practice. 
+A good mental model is to think of function values as containing 
+both the code in their body and the environment in which they are created. 
+When called, the function body sees the environment in which it was created, 
+not the environment in which it is called.
+
+In the example, 
+multiplier is called and creates an environment in which 
+its factor parameter is bound to 2. 
+The function value it returns, which is stored in twice, 
+remembers this environment. 
+So when that is called, it multiplies its argument by 2.
+
+
+RECURSION-
+A function that calls itself is called recursive.
+
+Take, for example, this alternative implementation of power:
+    function power(base, exponent) {
+      if (exponent == 0) {
+        return 1;
+      } else {
+        return base * power(base, exponent - 1);
+      }
+    }
+
+    console.log(power(2, 3));
+    // → 8
+This is rather close to the way mathematicians define exponentiation and 
+arguably describes the concept more clearly than the looping variant. 
+The function calls itself multiple times with 
+ever smaller exponents to achieve the repeated multiplication.
+
+But this implementation has one problem: 
+in typical JavaScript implementations, 
+it’s about three times slower than the looping version.
+Running through a simple loop is generally cheaper
+than calling a function multiple times.
+
+The dilemma of speed versus elegance is an interesting one.
+
+In the case of the power function, 
+the inelegant (looping) version is still fairly simple and easy to read.
+
+ADVICE:
+Worrying about efficiency can be a distraction. 
+It’s yet another factor that complicates program design, 
+and when you’re doing something that’s already difficult, 
+that extra thing to worry about can be paralyzing.
+
+When to use Recursion-
+Recursion is not always just an inefficient alternative to looping. 
+Some problems really are easier to solve with recursion than with loops. 
+Most often these are problems that require exploring or 
+processing several “branches”, 
+each of which might branch out again into even more branches.
+
+Better explained by example in the book.
+
+
+GROWING FUNCTIONS-
+A function with a nice, obvious name like zeroPad makes it easier 
+for someone who reads the code to figure out what it does. 
+And such a function is useful in more situations 
+than just this specific program. 
+For example, 
+you could use it to help print nicely aligned tables of numbers.
+
+
+FUNCTIONS AND SIDE EFFECTS-
+Functions can be roughly divided into: 
+those that are called for their side effects and 
+those that are called for their return value. 
+(Though it is definitely also possible to both 
+have side effects and return a value.)
+
+A pure function is a specific kind of value-producing function 
+that not only has no side effects but 
+also doesn’t rely on side effects from other code—for example, 
+it doesn’t read global bindings whose value might change. 
+
+A pure function has the pleasant property that, 
+when called with the same arguments, 
+it always produces the same value (and doesn’t do anything else).
+
+When to avoid pure fuunctions-
+Some operations are also easier to express in an efficient way 
+when we use side effects, 
+so computing speed can be a reason to avoid purity.
+
+
+SUMMARY-
+keyword, when used as an expression, can create a function value. 
+When used as a statement, it can be used to declare a binding and 
+give it a function as its value. 
+Arrow functions are yet another way to create functions.
+
+    // Define f to hold a function value
+    const f = function(a) {
+      console.log(a + 2);
+    };
+
+    // Declare g to be a function
+    function g(a, b) {
+      return a * b * 3.5;
+    }
+
+    // A less verbose function value
+    let h = a => a % 3;
+
+Remember:
+A key aspect in understanding functions is understanding scopes. 
+Each block creates a new scope. 
+Parameters and bindings declared in a given scope are local and 
+not visible from the outside. 
+Bindings declared with var behave differently—
+they end up in the nearest function scope or the global scope.
+
+Separating the tasks your program performs into different functions is helpful.
+You won’t have to repeat yourself as much, 
+and functions can help organize a program by 
+grouping code into pieces that do specific things.
+
+
+EXERCISES-
+1. Minimum 
+    const min = (a,b) => Math.min(a, b)
+
+2. Recursion 
+    const isEven = (num) => {
+      if (num === 0) {
+        return true
+      } else if (num === 1) {
+        return false
+      } else { 
+        if (num>=0) {
+          return isEven(num-2)
+        } else {
+          return isEven(num+2)
+        }
+      }
+    } 
+
+    console.log(isEven(50));
+    // → true
+    console.log(isEven(75));
+    // → false
+    console.log(isEven(-1));
+    // → ??
+    console.log(isEven(-2));
+
+3. Bean Counting
+    const countBs = (str) => {
+      let count = 0;
+      for (let w of str) {
+        if (w === 'B') {count++}
+      }
+      return count;
+    }
+    const countChar = (str, char) => {
+      let count = 0;
+      for (let i=0; i<str.length; i++) {
+        if (str[i] === char) {count+=1}
+      }
+      return count;
+    }
+
+    console.log(countBs("BBC"));
+    // → 2
+    console.log(countChar("kakkerlak", "k"));
+    // → 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
