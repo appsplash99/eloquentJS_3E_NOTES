@@ -1,0 +1,111 @@
+Numbers-
+JavaScript uses a fixed number of bits, 
+64 of them, to store a single number value. 
+There are only so many patterns you can make with 64 bits, 
+which means that the number of different numbers that can be represented is limited. 
+With N decimal digits, you can represent 10N numbers. 
+Similarly, given 64 binary digits, you can represent 264 different numbers, 
+which is about 18 quintillion (an 18 with 18 zeros after it). That’s a lot.
+
+
+Float-
+For very big or very small numbers, 
+you may also use scientific notation by adding an e (for exponent), 
+followed by the exponent of the number.
+2.998e8
+That is 2.998 × 108 = 299,800,000.
+
+
+Arithmetic Ops - 
+But as in mathematics, you can change this by wrapping the addition in parentheses.
+(100 + 4) * 11
+These rules of precedence are not something you should worry about. 
+When in doubt, just add parentheses.
+
+
+Special numbers-
+Infinity  = +ve infinity
+-Infinity = -ve infinity
+NaN stands for “not a number”, even though it is a value of the number type.
+
+
+STRINGS - 
+You can use single quotes, double quotes, or backticks to mark strings, 
+as long as the quotes at the start and the end of the string match.
+string Concatination: "con" + "cat" + "e" + "nate"
+`half of 100 is ${100 / 2}`
+
+
+Unary operators-
+Operators that use two values are called binary operators, 
+while those that take one are called unary operators.
+
+
+Boolean values-
+true and false
+
+
+Comparison-
+console.log(3 > 2) // → true
+console.log("Aardvark" < "Zoroaster") // → true
+When comparing strings, 
+JavaScript goes over the characters from left to right, 
+comparing the Unicode codes one by one.
+
+There is only one value in JavaScript that is not equal to itself, 
+and that is NaN (“not a number”).
+console.log(NaN == NaN) // → false
+
+
+Logical operators-
+and, or, not = &&, ||, ! 
+
+
+precedence order or logical opreators:
+In practice, 
+you can usually get by with knowing that of the operators we have seen so far, 
+|| has the lowest precedence, then comes &&, 
+then the comparison operators (>, ==, and so on), 
+and then the rest.
+
+
+Ternary Operator:
+condition ? statement_if_true : statement_if_false
+console.log(true ? 1 : 2); // → 1
+console.log(false ? 1 : 2); // → 2
+
+
+Empty values:
+null and undefined - used to denote the absence of a meaningful value.
+
+
+Automatic type conversion:
+console.log(8 * null) // → 0
+console.log("5" - 1) // → 4
+console.log("5" + 1) // → 51
+console.log("five" * 2) // → NaN
+console.log(false == 0) // → true
+
+Expressions like 0 == false and "" == false are also true because of automatic type conversion. 
+When you do not want any type conversions to happen, there are two additional operators: === and !==.
+
+==  → tests whether a value is precisely equal to the other
+=== → tests whether it is not precisely equal.
+So "" === false is false as expected.
+
+I recommend using the three-character comparison operators defensively 
+to prevent unexpected type conversions from tripping you up.
+
+
+Short-circuiting of logical operators:
+In the case of true || X, 
+no matter what X is—
+even if it’s a piece of program that does something terrible—
+the result will be true, and X is never evaluated. 
+The same goes for false && X, 
+which is false and will ignore X. 
+This is called short-circuit evaluation.
+
+
+
+
