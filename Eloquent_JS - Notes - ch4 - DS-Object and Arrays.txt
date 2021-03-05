@@ -360,33 +360,212 @@ meaning it negates negative values but leaves positive ones as they are.
 
 DESTRUCTURING:
 
+############# ASK IN VC ###############
+A similar trick works for objects, using braces instead of square brackets.
+  let {name} = {name: "Faraji", age: 23};
+  console.log(name);
+  // → Faraji
+  console.log(age);
+  // → 23
+  console.log(name.age);
+  // → undefined
+  console.log(typeof {name})
+  // → object
+Note that if you try to destructure null or undefined, you get an error, 
+much as you would if you directly try to access a property of those values.
+
 
 JSON:
+Because properties only grasp their value, rather than contain it, 
+objects and arrays are stored in the computer’s memory,
+as sequences of bits holding the addresses—the place in memory—
+of their contents.
+
+What we can do is serialize the data. 
+That means it is converted into a flat description. 
+A popular serialization format is called JSON (pronounced “Jason”), 
+which stands for JavaScript Object Notation.
+
+JSON looks similar to JavaScript’s way of writing arrays and objects, 
+with a few restrictions.:
+1. All property names have to be surrounded by double quotes, 
+2.  and only simple data expressions are allowed—
+    no function calls, bindings, or anything that involves actual computation. 
+3. Comments are not allowed in JSON.
+
+A journal entry might look like this when represented as JSON data:
+  {
+    "squirrel": false,
+    "events": ["work", "touched tree", "pizza", "running"]
+  }
+
+JSON.stringify: (given by JavaScript Language Itself)
+  takes a JavaScript value and returns a JSON-encoded string. 
+
+JSON.parse: (given by JavaScript Language Itself)
+  takes such a string(returned by stringify)
+  and converts it to the value it encodes.
+
+  let stringJSON = JSON.stringify({
+    squirrel: false,
+    events: ["weekend"]
+  });
+  console.log(stringJSON);
+  // → {"squirrel":false,"events":["weekend"]}
+  console.log(JSON.parse(stringJSON).events);
+  // → ["weekend"]
+
 
 
 SUMMARY:
+
+1.  Most values in JavaScript have properties, 
+    the exceptions being null and undefined. 
+2.  Properties are accessed using value.prop or value["prop"].
+3.  You can iterate over arrays using a special kind of for loop—
+    for (let element of array).
 
 
 EXERCISES:
 1.  The sum of a range:
     console.log(sum(range(1, 10)));
 
-
 1.1 Write a range function that takes two arguments, 
     start and end, and returns an array containing all the numbers 
     from start up to (and including) end.
+/* CODE SOLUTION */
+    // const range = (start, end) => {
+    //   let arr = [];
+    //   for (let i=start; i<=end; i++) {
+    //     arr.push(i)
+    //   }
+    //   return arr;
+    // }
 
 1.2 Next, write a sum function that takes an array of numbers and 
     returns the sum of these numbers. 
     Run the example program and see whether it does indeed return 55.
+/* CODE SOLUTION */
+    // const sum = (arr) => {
+    //   let total = 0;
+    //   for (let element of arr) {total+=element}
+    //   return total
+    // }
+
+1.3 Bonus Assignment: 
+    modify your range function to take an optional third argument:
+    that indicates the “step” value used when building the array. 
+    If no step is given, the elements go up by increments of one, 
+    corresponding to the old behavior. 
+    The function call range(1, 10, 2) should return [1, 3, 5, 7, 9]. 
+    Make sure it also works with negative step values:
+    so that range(5, 2, -1) produces [5, 4, 3, 2].
+/* CODE SOLUTION */
+    // const range = (start, end, step=1) => {
+    //   let arr = [];
+    //   if (step>=0) {
+    //     for (let i=start; i<=end;step) {
+    //       arr.push(i)
+    //       i+=step 
+    //     }
+    //   } else {
+    //     for (let i=start; i>=end;step) {
+    //       arr.push(i)
+    //       i+=step 
+    //     }
+    //   }
+    //   return arr;
+    // }
 
 
+2.Reversing an array:
+  Arrays have a reverse method that changes the array, 
+  by inverting the order in which its elements appear.
+  For this exercise, write two functions, reverseArray and reverseArrayInPlace. 
 
-2. Reversing an array
+2.1 The first, reverseArray, takes an array as argument and 
+    produces a new array that has the same elements in the inverse order.
+/* CODE SOLUTION */
+    // const reverseArray = (arr) => [...arr].reverse()
 
+
+2.2 The second, reverseArrayInPlace, does what the reverse method does: 
+    it modifies the array given as argument by reversing its elements. 
+    Neither may use the standard reverse method.
+/* CODE SOLUTION */
+    // const reverseArrayInPlace = (arr) => arr.reverse()
+
+2.3 Thinking back to the notes:
+    about side effects and pure functions in the previous chapter, 
+    which variant do you expect to be useful in more situations? 
+    Which one runs faster?
+/* SOLUTION */
+    reverseArray -> is a pure function, 
+      which returns a copy of array, for which it needs to store:
+      another array data structure as copy.
+
+    reverseArrayInPlace -> is not a pure function,
+      beacuse it mutates the original array parameter.
+
+    FASTER SOLUTION:
+      reverseArrayInPlace is faster than reverseArray because of:
+      not toring another datastructure.
+
+    USE CASE:
+      As reverseArray is a pure function, 
+      its more useful in functional progreamming and
+      cases where we must not mutate the parameter array.
+
+      As reverseArrayInPlace is not a pure function,
+      but returns a mutated reverse array efficiently,
+      it can be used at places:
+      where we have to reverse the initial array efficiently.
+
+    SIDE EFFECTS:
+      the above functions return the array along with a side effect.
 
 
 3. A list
+Objects, as generic blobs of values, 
+can be used to build all sorts of data structures. 
+A common data structure is the list (not to be confused with array).
+
+A list is a nested set of objects, 
+with the first object holding a reference to the second, 
+the second to the third, and so on.
+  let list = {
+    value: 1,
+    rest: {
+      value: 2,
+      rest: {
+        value: 3,
+        rest: null
+      }
+    }
+  };
+
+A nice thing about lists is that they can share parts of their structure. 
+For example, 
+if I create two new values {value: 0, rest: list} and {value: -1, rest: list} 
+(with list referring to the binding defined earlier),
+they are both independent lists, 
+but they share the structure that makes up their last three elements. 
+The original list is also still a valid three-element list.
+
+3.1 Write a function arrayToList that builds up a list structure 
+    like the one shown when given [1, 2, 3] as argument. 
+
+3.2 Also write a listToArray function that produces an array from a list. 
+
+3.3 Then add a helper function prepend, 
+    which takes an element and a list and 
+    creates a new list that adds the element to 
+    the front of the input list, and nth, which takes a list and a number and 
+    returns the element at the given position in the list 
+    (with zero referring to the first element) or 
+    undefined when there is no such element.
+
+
 
 
 4. Deep comparison
