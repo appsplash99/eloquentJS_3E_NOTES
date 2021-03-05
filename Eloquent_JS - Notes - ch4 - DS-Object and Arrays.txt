@@ -1,0 +1,413 @@
+CHAPTER 4 - Data Structures: Objects and Arrays
+
+Data sets-
+JavaScript provides a data type specifically 
+or storing sequences of values. 
+It is called an array and is written as a list of values 
+between square brackets, separated by commas.
+  let listOfNumbers = [2, 3, 5, 7, 11];
+The first index of an array is zero, not one. 
+So the first element is retrieved with listOfNumbers[0]. 
+
+
+Properties-
+Almost all JavaScript values have properties. 
+The exceptions are null and undefined. 
+If you try to access a property on one of these nonvalues, you get an error.
+  null.length;
+  // → TypeError: null has no properties
+
+The two main ways to access properties in JavaScript are with
+a dot and with square brackets. 
+Both value.x and value[x] access a property on value—
+but not necessarily the same property.
+
+The difference is in how x is interpreted. 
+When using a dot, the word after the dot is the literal name of the property. 
+When using square brackets, 
+the expression between the brackets is evaluated to get the property name. 
+Whereas value.x fetches the property of value named “x”, 
+value[x] tries to evaluate the expression x and uses the result, 
+converted to a string, as the property name.
+
+So if you know that the property you are interested in is called color,
+you say value.color. 
+If you want to extract the property named by the value held in the binding i, 
+you say value[i]
+
+Property names are strings. 
+They can be any string, 
+but the dot notation works only with names that look like valid binding names. 
+So if you want to access a property named 2 or John Doe,
+you must use square brackets: value[2] or value["John Doe"].
+
+
+Methods-
+Properties that contain functions 
+are generally called methods of the value they belong to, 
+as in “toUpperCase is a method of a string”.
+
+
+Objects-
+Values of the type object are arbitrary collections of properties. 
+One way to create an object is by using braces as an expression.
+
+Reading a property that doesn’t exist will give you the value undefined.
+
+REMEMBER:
+  To briefly return to our tentacle model of bindings—
+  property bindings are similar. 
+  They grasp values, 
+  but other bindings and properties might be holding onto those same values. 
+  You may think of objects as octopuses with any number of tentacles, 
+  each of which has a name tattooed on it.
+
+  The delete operator cuts off a tentacle from such an octopus. 
+  It is a unary operator that, when applied to an object property, 
+  will remove the named property from the object. 
+  This is not a common thing to do, but it is possible.
+
+  let anObject = {left: 1, right: 2};
+  console.log(anObject.left);
+  // → 1
+  delete anObject.left;
+  console.log(anObject.left);
+  // → undefined
+  console.log("left" in anObject);
+  // → false
+  console.log("right" in anObject);
+  // → true
+
+The binary in operator, 
+when applied to a string and an object, 
+tells you whether that object has a property with that name.
+The difference between 
+setting a property to undefined and actually deleting it is that, 
+in the first case, the object still has the property 
+(it just doesn’t have a very interesting value), whereas in the second case
+the property is no longer present and in will return false.
+
+To find out what properties an object has, you can use the Object.keys
+
+There’s an Object.assign function 
+that copies all properties from one object into another.
+  let objectA = {a: 1, b: 2};
+  Object.assign(objectA, {b: 3, c: 4});
+  console.log(objectA);
+  // → {a: 1, b: 3, c: 4}
+
+REMEMBER:
+  Arrays, then, are just a kind of object 
+  specialized for storing sequences of things. 
+  If you evaluate typeof [], it produces "object". 
+  You can see them as long, 
+  flat octopuses with all their tentacles in a neat row, labeled with numbers.
+
+
+MUTABILITY-
+numbers, strings, and Booleans, are all immutable.
+
+When we have two numbers, 120 and 120, 
+we can consider them precisely the same number, 
+whether or not they refer to the same physical bits. 
+
+With objects, 
+there is a difference between having two references to the same object 
+and having two different objects that contain the same properties. 
+Consider the following code:
+  let object1 = {value: 10};
+  let object2 = object1;
+  let object3 = {value: 10};
+
+  console.log(object1 == object2);
+  // → true
+  console.log(object1 == object3);
+  // → false
+
+  object1.value = 15;
+  console.log(object2.value);
+  // → 15
+  console.log(object3.value);
+  // → 10
+The object1 and object2 bindings grasp the same object, 
+which is why changing object1 also changes the value of object2. 
+They are said to have the same identity. 
+The binding object3 points to a different object, 
+which initially contains the same properties as object1 
+but lives a separate life.
+
+Bindings can also be changeable or constant, 
+but this is separate from the way their values behave. 
+
+Even though number values don’t change, 
+you can use a 'let' binding to keep track of a changing number 
+by changing the value the binding points at. 
+Similarly, though a 'const' binding to an object can itself not be changed 
+and will continue to point at the same object, 
+the contents of that object might change.
+
+When you compare objects with JavaScript’s == operator, 
+it compares by identity: 
+it will produce true only if both objects are precisely the same value.
+Comparing different objects will return false, 
+even if they have identical properties.
+
+
+The lycanthrope's log:
+  let journal = [];
+  function addEntry(events, squirrel) {
+    journal.push({events, squirrel});
+  }
+Note:
+  The object added to the journal looks a little odd. 
+  Instead of declaring properties like events: events, 
+  it just gives a property name. 
+  This is shorthand that means the same thing—
+  if a property name in brace notation isn’t followed by a value, 
+  its value is taken from the binding with the same name.
+
+Arrays have an includes method that checks 
+whether a given value exists in the array. 
+The function uses that to determine whether 
+the event name it is interested in is part of the event list for a given day.
+
+
+Array loops:
+  
+  for (let i = 0; i < JOURNAL.length; i++) {
+  let entry = JOURNAL[i];
+  // Do something with entry
+  }
+
+When a for loop looks like this, with the word of after a variable definition, 
+it will loop over the elements of the value given after of. 
+This works not only for arrays but also for strings and 
+some other data structures. We’ll discuss how it works in Chapter 6.
+
+
+Further arrayology:
+
+We saw push and pop, 
+which add and remove elements at the end of an array,
+earlier in this chapter. 
+The corresponding methods for adding 
+and removing things at the start of an array are called unshift and shift.
+  let todoList = [];
+  function remember(task) {
+    todoList.push(task);
+  }
+  function getTask() {
+    return todoList.shift();
+  }
+  function rememberUrgently(task) {
+    todoList.unshift(task);
+  }
+
+To search for a specific value, arrays provide an indexOf method. 
+
+Use:
+Array.indexOf to find first instance in an array
+Array.lastIndexOf to find last instance in an array
+(if item not found returns: -1)
+  console.log([1, 2, 3, 2, 1].indexOf(2));
+  // → 1
+  console.log([1, 2, 3, 2, 1].lastIndexOf(2));
+  // → 3
+
+Array.slice:
+  Another fundamental array method is slice, 
+  which takes start and end indices and 
+  returns an array that has only the elements between them. 
+  The start index is inclusive, the end index exclusive.
+    console.log([0, 1, 2, 3, 4].slice(2, 4));
+    // → [2, 3]
+    console.log([0, 1, 2, 3, 4].slice(2));
+    // → [2, 3, 4]
+
+Array.concat:
+  The concat method can be used to glue arrays together to create a new array, 
+  similar to what the + operator does for strings.
+  function remove(array, index) {
+    return array.slice(0, index)
+      .concat(array.slice(index + 1));
+  }
+  console.log(remove(["a", "b", "c", "d", "e"], 2));
+  // → ["a", "b", "d", "e"]
+
+If you pass concat an argument that is not an array, 
+that value will be added to the new array as if it were a one-element array.
+
+
+Strings and their properties:
+Values of type string, number, 
+and Boolean are not objects, and 
+though the language doesn’t complain if you try to set new properties on them,
+it doesn’t actually store those properties. 
+As mentioned earlier, such values are immutable and cannot be changed.
+
+But these types do have built-in properties. 
+Every string value has a number of methods.
+
+  console.log("coconuts".slice(4, 7));
+  // → nut
+  console.log("coconut".indexOf("u"));
+  // → 5
+
+String.indexOf:
+can search for more than one charaters
+  console.log("one two three".indexOf("ee"));
+  // → 11
+
+String Trim:
+The trim method removes whitespace 
+(spaces, newlines, tabs, and similar characters) 
+from the start and end of a string.
+  console.log("  okay \n ".trim());
+  // → okay
+
+String.zeroPad:
+  console.log(String(6).padStart(3, "0"));
+  // → 006
+
+String.split() and String.join():
+  let sentence = "Secretarybirds specialize in stomping";
+  let words = sentence.split(" ");
+  console.log(words);
+  // → ["Secretarybirds", "specializea", "in", "stomping"]
+  console.log(words.join(". "));
+  // → Secretarybirds. specialize. in. stomping
+
+String.repeat():
+  console.log("LA".repeat(3));
+  // → LALALA
+
+String.length:
+  let string = "abc";
+  console.log(string.length);
+  // → 3
+  console.log(string[1]);
+  // → b
+
+
+Rest parameters:
+  function max(...numbers) {
+    let result = -Infinity;
+    for (let number of numbers) {
+      if (number > result) result = number;
+    }
+    return result;
+  }
+  console.log(max(4, 1, 9, -2));
+  // → 9
+When such a function is called, 
+the rest parameter is bound to an array containing all further arguments. 
+If there are other parameters before it, 
+their values aren’t part of that array. 
+When, as in max, it is the only parameter, it will hold all arguments.
+
+You can use a similar three-dot notation 
+to call a function with an array of arguments.
+  let numbers = [5, 1, 7];
+  console.log(max(...numbers));
+  // → 7
+
+Square bracket array notation similarly allows the triple-dot operator:
+to spread another array into the new array.
+  let words = ["never", "fully"];
+  console.log(["will", ...words, "understand"]);
+  // → ["will", "never", "fully", "understand"]
+
+
+The Math object:
+The Math object is used as a container to 
+group a bunch of related functionality. 
+There is only one Math object, 
+and it is almost never useful as a value. 
+Rather, it provides a namespace so that all these functions and 
+values do not have to be global bindings.
+
+Having too many global bindings “pollutes” the namespace.
+
+Trignometric functions:
+  function randomPointOnCircle(radius) {
+    let angle = Math.random() * 2 * Math.PI;
+    return {x: radius * Math.cos(angle),
+            y: radius * Math.sin(angle)};
+  }
+  console.log(randomPointOnCircle(2));
+  // → {x: 0.3667, y: 1.966}
+
+
+Math.random:
+This is a function that returns a new pseudorandom number:
+between zero(inclusive) and one (exclusive) every time you call it.
+  console.log(Math.random());
+  // → 0.36993729369714856
+  console.log(Math.random());
+  // → 0.727367032552138
+  console.log(Math.random());
+  // → 0.40180766698904335
+
+Math.floor: to get a whole number
+  console.log(Math.floor(Math.random() * 10));
+  // → 2
+
+Math.ceil: (for “ceiling”, which rounds up to a whole number),
+Math.round: (to the nearest whole number),
+Math.abs, which takes the absolute value of a number, 
+meaning it negates negative values but leaves positive ones as they are.
+
+
+DESTRUCTURING:
+
+
+JSON:
+
+
+SUMMARY:
+
+
+EXERCISES:
+1.  The sum of a range:
+    console.log(sum(range(1, 10)));
+
+
+1.1 Write a range function that takes two arguments, 
+    start and end, and returns an array containing all the numbers 
+    from start up to (and including) end.
+
+1.2 Next, write a sum function that takes an array of numbers and 
+    returns the sum of these numbers. 
+    Run the example program and see whether it does indeed return 55.
+
+
+
+2. Reversing an array
+
+
+
+3. A list
+
+
+4. Deep comparison
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
